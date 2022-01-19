@@ -59,7 +59,7 @@ namespace EFCoreNortwind.Controllers
             //şimdiye kadar ne kadar ciro yaptık
             var pro5 = _db.OrderDetails.Sum(x => x.UnitPrice * x.Quantity - (x.UnitPrice * (decimal)x.Discount));
 
-            //orta
+            //orta seviye
 
             //sorgu6
             //hangi müşteri kaç ader ürün sipariş etti
