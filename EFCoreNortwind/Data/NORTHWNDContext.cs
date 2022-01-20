@@ -1,4 +1,5 @@
 ﻿using System;
+using EFCoreNortwind.Data.Dtos;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 
@@ -17,6 +18,8 @@ namespace EFCoreNortwind.Data
         {
         }
 
+        public virtual DbSet<MostOrderedFiveProducts> MostOrderedFiveProducts { get; }//view tablosu gibi gibi dbsetle bağlıyoruz.
+        public virtual DbSet<PagedProduct> PagedProduct { get; set; } //tanımladık
         public virtual DbSet<Address> Addresses { get; set; }
         public virtual DbSet<AlphabeticalListOfProduct> AlphabeticalListOfProducts { get; set; }
         public virtual DbSet<Category> Categories { get; set; }
@@ -64,18 +67,30 @@ namespace EFCoreNortwind.Data
         {
             modelBuilder.HasAnnotation("Relational:Collation", "SQL_Latin1_General_CP1_CI_AS");
 
+            modelBuilder.Entity<PagedProduct>(entity =>
+            {
+                entity.HasNoKey();// bu entity olmadğığnı söylüyor
+                //bu view değil SP o yüzden toview yok
+            });
+
             modelBuilder.Entity<Address>(entity =>
             {
-                entity.HasNoKey();
-
-                entity.ToTable("Address");
-
-                entity.Property(e => e.City).HasMaxLength(20);
-
-                entity.Property(e => e.Provience).HasMaxLength(20);
-
-                entity.Property(e => e.StreetName).HasMaxLength(50);
+                entity.HasNoKey();// ikinci adım onmodelcreating methodu içine bağlamak
+                entity.ToView("MostOrderedFiveProducts"); //view ismini veriyoruz sqlle aynı yazıp ona bağlıyoruz
             });
+
+            modelBuilder.Entity<Address>(entity =>
+                {
+                    entity.HasNoKey();
+
+                    entity.ToTable("Address");
+
+                    entity.Property(e => e.City).HasMaxLength(20);
+
+                    entity.Property(e => e.Provience).HasMaxLength(20);
+
+                    entity.Property(e => e.StreetName).HasMaxLength(50);
+                });
 
             modelBuilder.Entity<AlphabeticalListOfProduct>(entity =>
             {
@@ -86,14 +101,14 @@ namespace EFCoreNortwind.Data
                 entity.Property(e => e.CategoryId).HasColumnName("CategoryID");
 
                 entity.Property(e => e.CategoryName)
-                    .IsRequired()
-                    .HasMaxLength(15);
+                                .IsRequired()
+                                .HasMaxLength(15);
 
                 entity.Property(e => e.ProductId).HasColumnName("ProductID");
 
                 entity.Property(e => e.ProductName)
-                    .IsRequired()
-                    .HasMaxLength(40);
+                                .IsRequired()
+                                .HasMaxLength(40);
 
                 entity.Property(e => e.QuantityPerUnit).HasMaxLength(20);
 
